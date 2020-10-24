@@ -1,0 +1,41 @@
+---
+- hosts: frontservers
+  remote_user: centos
+  become: yes
+  
+  vars:
+    version: latest
+
+  tasks:
+   - name: login docker ecr
+     shell: /usr/local/bin/aws ecr get-login-password --region us-east-2 | sudo docker login --username AWS --password-stdin 059556936706.dkr.ecr.us-east-2.amazonaws.com/frontend
+
+   - name: pull container
+     shell: sudo docker pull 059556936706.dkr.ecr.us-east-2.amazonaws.com/frontend:{{ version }}
+
+   - name: install docekr module for python
+     pip:
+       name: docker
+
+   - name: run container
+     docker_container:
+       name: frontend
+       image: 059556936706.dkr.ecr.us-east-2.amazonaws.com/frontend:{{ version }}
+       #path: docker
+       state: started
+       published_ports: 80:80
+
+   - name: wait for the Application (80) port to become open.
+     wait_for:
+       host: 127.0.0.1
+       port: "{{ item }}"
+       timeout: 420
+       delay: 15
+     with_items:
+     - 80
+
+   - name: check if container is running
+     shell: docker ps
+     register: out
+
+   - debug: var=out.stdout_lines

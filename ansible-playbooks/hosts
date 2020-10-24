@@ -1,0 +1,5 @@
+[frontservers]
+frontend1 ansible_host=10.0.1.53 ansible_user=centos ansible_ssh_private_key_file=/home/centos/.ssh/jenkins.pem
+
+[frontservers:vars]
+ansible_python_interpreter=/usr/bin/python3
