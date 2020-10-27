@@ -1,15 +1,18 @@
 ---
 - hosts: frontservers
   remote_user: centos
-  become: yes
-  gather_facts: false  
+  become: yes  
 
   tasks:
+   - name: Set Version 
+     set_fact: 
+       image_version: "059556936706.dkr.ecr.us-east-2.amazonaws.com/frontend:{{ version }}"
+   
    - name: login docker ecr
      shell: /usr/local/bin/aws ecr get-login-password --region us-east-2 | sudo docker login --username AWS --password-stdin 059556936706.dkr.ecr.us-east-2.amazonaws.com/frontend
 
    - name: pull container
-     shell: sudo docker pull 059556936706.dkr.ecr.us-east-2.amazonaws.com/frontend:{{ version }}
+     shell: "image_version"
 
    - name: install docekr module for python
      pip:
@@ -18,7 +21,7 @@
    - name: run container
      docker_container:
        name: frontend
-       image: 059556936706.dkr.ecr.us-east-2.amazonaws.com/frontend:{{ version }}
+       image: "image_version"
        #path: docker
        state: started
        published_ports: 80:80
