@@ -21,7 +21,7 @@
    - name: run container
      docker_container:
        name: frontend
-       image: {{ image_version }}
+       image: "{{ image_version }}"
        #path: docker
        state: started
        published_ports: 80:80
