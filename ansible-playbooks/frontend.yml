@@ -11,9 +11,6 @@
    - name: login docker ecr
      shell: /usr/local/bin/aws ecr get-login-password --region us-east-2 | sudo docker login --username AWS --password-stdin 059556936706.dkr.ecr.us-east-2.amazonaws.com/frontend
 
-   - name: pull container
-     shell: "docker pull {{ image_version }}"
-
    - name: install docekr module for python
      pip:
        name: docker
@@ -22,7 +19,10 @@
      docker_container:
        name: frontend
        image: "{{ image_version }}"
-       #path: docker
+       pull: yes
+       restart_policy: always
+       log_driver: json-file
+       network_mode: bridge
        state: started
        published_ports: 80:80
 
